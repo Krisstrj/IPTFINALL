@@ -1,102 +1,130 @@
-import Image from "next/image";
+"use client";
 import Link from "next/link";
-import { ArrowRightIcon, BookOpenIcon, UserGroupIcon, ClockIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { 
+  ArrowRightIcon, 
+  ShieldCheckIcon,
+  UserCircleIcon,
+  ChevronDownIcon,
+  SparklesIcon
+} from '@heroicons/react/24/outline';
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 to-white font-['Poppins']">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-100 via-white to-white"></div>
-        <div className="absolute inset-0 bg-grid-indigo-900/[0.03] bg-[size:60px_60px]"></div>
-        
-        {/* Content */}
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-5xl mx-auto">
-            {/* Logo/Brand */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-indigo-600 shadow-lg mb-6">
-                <BookOpenIcon className="w-10 h-10 text-white" />
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900">
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-8">
+              <Link href="/" className="text-white font-semibold text-xl">DeFiShield</Link>
+              <div className="hidden md:flex space-x-6">
+                <Link href="/app" className="text-gray-300 hover:text-white transition-colors">DeFi App</Link>
+                <Link href="/assets" className="text-gray-300 hover:text-white transition-colors">Assets</Link>
+                <Link href="/features" className="text-gray-300 hover:text-white transition-colors">Features</Link>
+                <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
+                <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">FAQ</Link>
+                <Link href="/protection" className="flex items-center text-gray-300 hover:text-white transition-colors">
+                  <ShieldCheckIcon className="h-5 w-5 mr-1" />
+                  Protection
+                </Link>
               </div>
-              <h1 className="text-5xl md:text-7xl font-bold text-indigo-900 mb-6 font-['Montserrat'] tracking-tight">
-                Digital Library
-              </h1>
-              <p className="text-xl md:text-2xl text-indigo-600 max-w-2xl mx-auto font-['Inter'] leading-relaxed">
-                Your gateway to knowledge and learning resources
-              </p>
             </div>
+            <Link 
+              href="/auth" 
+              className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors"
+            >
+              <UserCircleIcon className="h-5 w-5 mr-2" />
+              Create Account
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        {/* Background Effects */}
+        <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:60px_60px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
+        
+        {/* Floating Asset Nodes */}
+        <div className="absolute inset-0">
+          {[
+            { name: "Cortex", value: "20,945", x: "20%", y: "30%" },
+            { name: "Aelf", value: "15,782", x: "70%", y: "40%" },
+            { name: "Quant", value: "12,456", x: "40%", y: "60%" },
+            { name: "Meeton", value: "8,923", x: "80%", y: "20%" }
+          ].map((node, index) => (
+            <div
+              key={index}
+              className="absolute transform -translate-x-1/2 -translate-y-1/2"
+              style={{ left: node.x, top: node.y }}
+            >
+              <div className="relative group">
+                <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:bg-blue-500/30 transition-all duration-300"></div>
+                <div className="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-lg p-4 shadow-lg">
+                  <p className="text-white font-semibold">{node.name}</p>
+                  <p className="text-blue-400">{node.value}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Call to Action Above Headline */}
+            <div className="flex items-center justify-center space-x-2 mb-6 opacity-0 animate-[fadeIn_0.8s_ease-out_forwards]">
+              <SparklesIcon className="h-5 w-5 text-blue-400" />
+              <span className="text-blue-400 font-medium">Unlock Your Assets Spark!</span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white opacity-0 animate-[fadeIn_0.8s_ease-out_0.2s_forwards]">
+              One-click for Asset Defense
+            </h1>
+            
+            {/* Subheadline */}
+            <p className="text-xl md:text-2xl mb-10 text-gray-300 max-w-2xl mx-auto opacity-0 animate-[fadeIn_0.8s_ease-out_0.4s_forwards]">
+              Dive into the art assets, where innovative blockchain technology meets financial expertise
+            </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mt-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center opacity-0 animate-[fadeIn_0.8s_ease-out_0.6s_forwards]">
               <Link 
-                href="/auth" 
-                className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-indigo-600 rounded-xl overflow-hidden transition-all duration-300 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 min-w-[200px]"
+                href="/app" 
+                className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-indigo-500"></span>
-                <span className="relative flex items-center">
-                  Get Started
-                  <ArrowRightIcon className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform" />
-                </span>
+                Open App
+                <ArrowRightIcon className="ml-2 h-5 w-5" />
+              </Link>
+              <Link 
+                href="#features" 
+                className="inline-flex items-center px-8 py-4 border border-white/20 text-lg font-medium rounded-lg text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white transition-all duration-200"
+              >
+                Discover More
               </Link>
             </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute top-1/2 left-0 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 motion-safe:animate-[float_7s_ease-in-out_infinite]"></div>
-            <div className="absolute top-1/2 right-0 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 motion-safe:animate-[float_7s_ease-in-out_infinite_2s]"></div>
-            <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 motion-safe:animate-[float_7s_ease-in-out_infinite_4s]"></div>
           </div>
+        </div>
+
+        {/* Scroll Prompt */}
+        <div className="absolute bottom-8 left-8 flex items-center space-x-2 text-gray-400 animate-pulse">
+          <span>02/03</span>
+          <span>·</span>
+          <span>Scroll down</span>
+          <ChevronDownIcon className="h-5 w-5" />
+        </div>
+
+        {/* Partner Logos */}
+        <div className="absolute bottom-8 right-8 flex items-center space-x-8">
+          {["Vercel", "Loom", "Cash App"].map((logo, index) => (
+            <div key={index} className="text-gray-400 hover:text-white transition-colors">
+              {logo}
+            </div>
+          ))}
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gradient-to-b from-white to-indigo-50 py-12 mt-auto">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h4 className="text-xl font-semibold mb-4 text-indigo-900 font-['Montserrat']">IPT Digital Library</h4>
-              <p className="text-indigo-600 font-['Inter']">Empowering education through digital resources</p>
-            </div>
-            <div>
-              <h4 className="text-xl font-semibold mb-4 text-indigo-900 font-['Montserrat']">Quick Links</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link 
-                    href="/about" 
-                    className="text-indigo-600 hover:text-indigo-900 transition-colors inline-flex items-center font-['Inter']"
-                  >
-                    Our Mission
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    href="/contact" 
-                    className="text-indigo-600 hover:text-indigo-900 transition-colors inline-flex items-center font-['Inter']"
-                  >
-                    Get Support
-                  </Link>
-                </li>
-                <li> //
-                  <Link 
-                    href="/privacy" 
-                    className="text-indigo-600 hover:text-indigo-900 transition-colors inline-flex items-center font-['Inter']"
-                  >
-                    Terms & Privacy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-xl font-semibold mb-4 text-indigo-900 font-['Montserrat']">Contact Us</h4>
-              <p className="text-indigo-600 font-['Inter']">Email: nash@gmail.com</p>
-              <p className="text-indigo-600 font-['Inter']">Phone: 123421</p>
-            </div>
-          </div>
-          <div className="border-t border-indigo-100 mt-8 pt-8 text-center">
-            <p className="text-indigo-600 font-['Inter']">© {new Date().getFullYear()}Digital Library. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

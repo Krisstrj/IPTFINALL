@@ -23,8 +23,8 @@ interface AppContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, password_confirmation: string) => Promise<void>;
-  logout: () => Promise<void>;
+  register: (name: string, email: string, password: string, password_confirmation: string, role: 'user' | 'admin') => Promise<void>;
+  logout: () => Promise<boolean>;
   refreshAuth: () => Promise<void>;
   updateUser: (userData: User) => void;
 }
@@ -135,7 +135,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const register = async (name: string, email: string, password: string, password_confirmation: string) => {
+  const register = async (name: string, email: string, password: string, password_confirmation: string, role: 'user' | 'admin') => {
     setIsLoading(true);
     try {
       await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/sanctum/csrf-cookie`, {
@@ -144,7 +144,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/register`, 
-        { name, email, password, password_confirmation },
+        { name, email, password, password_confirmation, role },
         {
           headers: { Accept: 'application/json' },
           withCredentials: true
@@ -192,20 +192,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setAuthToken(null);
       setUser(null);
       
-      // Set loading to false before redirect
-      setIsLoading(false);
+      // Clear any pending requests
+      axios.defaults.headers.common['Authorization'] = '';
       
       // Show success message
       toast.success('Logged out successfully');
       
-      // Clear any pending requests
-      axios.defaults.headers.common['Authorization'] = '';
-      
-      // Use setTimeout to ensure state updates are processed before redirect
-      setTimeout(() => {
-        // Force a hard redirect to auth page
-        window.location.href = '/auth';
-      }, 100);
+      return true;
     } catch (error) {
       console.error('Logout error:', error);
       // Even if there's an error, ensure we clear local state
@@ -217,17 +210,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       // Clear any pending requests
       axios.defaults.headers.common['Authorization'] = '';
       
-      // Set loading to false before redirect
-      setIsLoading(false);
-      
-      // Show success message
       toast.success('Logged out successfully');
       
-      // Use setTimeout to ensure state updates are processed before redirect
-      setTimeout(() => {
-        // Force a hard redirect to auth page
-        window.location.href = '/auth';
-      }, 100);
+      return true;
+    } finally {
+      setIsLoading(false);
     }
   };
 

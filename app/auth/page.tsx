@@ -4,17 +4,17 @@ import React, { useEffect, useState } from 'react';
 import { useAppContext } from '@/context/AppProvider';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { BookOpenIcon, EnvelopeIcon, LockClosedIcon, UserIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, EnvelopeIcon, LockClosedIcon, UserIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import Loader from '@/components/loader';
-//
+
 interface FormData {
-  name: string;
+  name?: string;
   email: string;
   password: string;
-  password_confirmation: string;
-  role: string;
+  password_confirmation?: string;
+  role: 'user' | 'admin';
 }
-//
+
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [formData, setFormData] = useState<FormData>({
@@ -26,7 +26,6 @@ const AuthPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasRedirected, setHasRedirected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { login, register, authToken, isLoading, user } = useAppContext();
 
@@ -48,10 +47,9 @@ const AuthPage = () => {
     });
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void> = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    setError(null);
 
     try {
       if (isLogin) {
@@ -59,23 +57,23 @@ const AuthPage = () => {
         toast.success("Logged in successfully!");
       } else {
         if (formData.password !== formData.password_confirmation) {
-          throw new Error("Passwords don't match!");
+          toast.error("Passwords don't match!");
+          setIsSubmitting(false);
+          return;
         }
         await register(
-          formData.name,
+          formData.name!,
           formData.email,
           formData.password,
-          formData.password_confirmation,
+          formData.password_confirmation!,
           formData.role
         );
         toast.success("Registered successfully! Please login.");
         setIsLogin(true);
       }
-    } catch (error) {
-      const axiosError = error as Error;
-      console.error("Authentication error:", axiosError);
-      setError(axiosError.message || "Authentication failed");
-      toast.error(axiosError.message || "Authentication failed");
+    } catch (error: any) {
+      console.error("Authentication error:", error);
+      toast.error(error?.response?.data?.message || "Authentication failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -84,173 +82,197 @@ const AuthPage = () => {
   if (isLoading || authToken) {
     return <Loader />;
   }
-//
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-700/50">
-        <div>
-          <div className="flex justify-center">
-            <div className="p-3 rounded-full bg-blue-500/10 border border-blue-500/20">
-              <BookOpenIcon className="h-8 w-8 text-blue-500" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:60px_60px]"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
+
+      {/* Floating Elements */}
+      <div className="absolute inset-0">
+        {[
+          { x: "10%", y: "20%" },
+          { x: "85%", y: "30%" },
+          { x: "20%", y: "70%" },
+          { x: "75%", y: "80%" }
+        ].map((pos, index) => (
+          <div
+            key={index}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2"
+            style={{ left: pos.x, top: pos.y }}
+          >
+            <div className="relative group">
+              <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:bg-blue-500/30 transition-all duration-300"></div>
+              <div className="relative bg-gray-900/80 backdrop-blur-sm border border-white/10 rounded-lg p-4 shadow-lg">
+                <ShieldCheckIcon className="h-6 w-6 text-blue-400" />
+              </div>
             </div>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-white tracking-tight">
-            {isLogin ? "Login to Your Account" : "Create an Account"}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            {isLogin ? "Welcome back! Please enter your details" : "Join us and start your journey"}
-          </p>
-        </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {!isLogin && (
-              <>
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <UserIcon className="h-5 w-5 text-gray-400" />
-                    </div>
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      required
-                      className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg bg-gray-700/50 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                      placeholder="John Doe"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
+        ))}
+      </div>
 
-                <div>
-                  <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-1">Account Type</label>
-                  <div className="relative">
-                    <select
-                      id="role"
-                      name="role"
-                      required
-                      className="appearance-none block w-full pl-3 pr-10 py-2 border border-gray-600 rounded-lg bg-gray-700/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                      value={formData.role}
-                      onChange={handleInputChange}
-                    >
-                      <option value="user">Library Member</option>
-                      <option value="admin">Library Staff</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <EnvelopeIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg bg-gray-700/50 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
+      <div className="max-w-md w-full space-y-8 relative z-10">
+        <div className="bg-gray-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-white/10">
+          <div>
+            <div className="flex justify-center">
+              <div className="p-3 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30">
+                <ShieldCheckIcon className="h-8 w-8 text-blue-400" />
               </div>
             </div>
+            <h2 className="mt-6 text-center text-3xl font-bold text-white tracking-tight">
+              {isLogin ? "Secure Access" : "Create Shield"}
+            </h2>
+            <p className="mt-2 text-center text-sm text-gray-400">
+              {isLogin ? "Enter your credentials to access your assets" : "Set up your secure account"}
+            </p>
+          </div>
+          
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              {!isLogin && (
+                <>
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <UserIcon className="h-5 w-5 text-blue-400" />
+                      </div>
+                      <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        required
+                        className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-lg bg-gray-800/50 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        placeholder="Input Name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <LockClosedIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  minLength={8}
-                  className="appearance-none block w-full pl-10 pr-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors duration-200"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
+                  <div>
+                    <label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-1">Account Type</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <UserGroupIcon className="h-5 w-5 text-blue-400" />
+                      </div>
+                      <select
+                        id="role"
+                        name="role"
+                        required
+                        className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-lg bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        value={formData.role}
+                        onChange={handleInputChange}
+                      >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+                  </div>
+                </>
+              )}
 
-            {!isLogin && (
               <div>
-                <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-300 mb-1">Confirm Password</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <LockClosedIcon className="h-5 w-5 text-gray-400" />
+                    <EnvelopeIcon className="h-5 w-5 text-blue-400" />
                   </div>
                   <input
-                    id="password_confirmation"
-                    name="password_confirmation"
-                    type="password"
+                    id="email"
+                    name="email"
+                    type="email"
                     required
-                    minLength={8}
-                    className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-lg bg-gray-700/50 placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
-                    placeholder="••••••••"
-                    value={formData.password_confirmation}
+                    className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-lg bg-gray-800/50 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="you@example.com"
+                    value={formData.email}
                     onChange={handleInputChange}
                   />
                 </div>
               </div>
-            )}
 
-            {isLogin && (
-              <div className="flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => router.push('/auth/forgot-password')}
-                  className="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors duration-200"
-                >
-                  Forgot Password?
-                </button>
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <LockClosedIcon className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    minLength={8}
+                    className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-lg bg-gray-800/50 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
-            )}
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-blue-500/20"
-            >
-              {isSubmitting ? (
-                <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin"></div>
-              ) : (
-                isLogin ? "Sign in" : "Create Account"
+              {!isLogin && (
+                <div>
+                  <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-300 mb-1">Confirm Password</label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <LockClosedIcon className="h-5 w-5 text-blue-400" />
+                    </div>
+                    <input
+                      id="password_confirmation"
+                      name="password_confirmation"
+                      type="password"
+                      required
+                      minLength={8}
+                      className="appearance-none block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-lg bg-gray-800/50 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      placeholder="••••••••"
+                      value={formData.password_confirmation}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
               )}
-            </button>
-          </div>
-        </form>
 
-        <div className="text-center">
-          <p className="text-sm text-gray-400">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              disabled={isSubmitting}
-              className="ml-1 font-medium text-blue-400 hover:text-blue-300 focus:outline-none focus:underline transition-colors duration-200"
-            >
-              {isLogin ? "Register" : "Login"}
-            </button>
-          </p>
+              {isLogin && (
+                <div className="flex items-center justify-end">
+                  <button
+                    type="button"
+                    className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors duration-200"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-blue-500/20"
+              >
+                {isSubmitting ? (
+                  <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin"></div>
+                ) : (
+                  isLogin ? "Access Assets" : "Create Shield"
+                )}
+              </button>
+            </div>
+          </form>
+
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-400">
+              {isLogin ? "Don't have a shield?" : "Already have a shield?"}
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                disabled={isSubmitting}
+                className="ml-1 font-medium text-blue-400 hover:text-blue-300 focus:outline-none focus:underline transition-colors duration-200"
+              >
+                {isLogin ? "Create One" : "Access"}
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>
