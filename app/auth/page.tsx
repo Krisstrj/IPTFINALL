@@ -14,7 +14,7 @@ interface FormData {
   password_confirmation: string;
   role: string;
 }
-
+//
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [formData, setFormData] = useState<FormData>({
