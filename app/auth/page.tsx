@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { BookOpenIcon, EnvelopeIcon, LockClosedIcon, UserIcon } from '@heroicons/react/24/outline';
 import Loader from '@/components/loader';
-
+//
 interface FormData {
   name: string;
   email: string;
