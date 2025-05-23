@@ -76,7 +76,7 @@ export default function Home() {
                     Get Support
                   </Link>
                 </li>
-                <li>
+                <li> //
                   <Link 
                     href="/privacy" 
                     className="text-indigo-600 hover:text-indigo-900 transition-colors inline-flex items-center font-['Inter']"
